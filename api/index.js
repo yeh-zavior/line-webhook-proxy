@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   // 轉送 webhook 內容到你的 Apps Script Web App
-  const scriptUrl = process.env.APPS_SCRIPT_URL2;
+  const scriptUrl = process.env.APPS_SCRIPT_URL;
 
   try {
     const forward = await fetch(scriptUrl, {
