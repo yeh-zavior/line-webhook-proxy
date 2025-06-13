@@ -4,10 +4,6 @@ export default async function handler(req, res) {
   }
 
   const scriptUrl = process.env.APPS_SCRIPT_URL;
-  if (!scriptUrl) {
-    console.error("❌ Missing APPS_SCRIPT_URL");
-    return res.status(500).send("Missing Apps Script URL");
-  }
 
   try {
     const forward = await fetch(scriptUrl, {
@@ -26,3 +22,4 @@ export default async function handler(req, res) {
     return res.status(500).send("Webhook Forward Failed");
   }
 }
+
