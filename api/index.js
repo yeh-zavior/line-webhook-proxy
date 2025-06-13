@@ -3,8 +3,11 @@ export default async function handler(req, res) {
     return res.status(405).send("Method Not Allowed");
   }
 
-  // 轉送 webhook 內容到你的 Apps Script Web App
   const scriptUrl = process.env.APPS_SCRIPT_URL;
+  if (!scriptUrl) {
+    console.error("❌ Missing APPS_SCRIPT_URL");
+    return res.status(500).send("Missing Apps Script URL");
+  }
 
   try {
     const forward = await fetch(scriptUrl, {
