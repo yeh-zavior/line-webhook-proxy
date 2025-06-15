@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   res.status(200).send("OK");
 
   // ✅ Step 2: 背後非同步轉送 webhook 到 Google Apps Script
-  const scriptUrl = process.env.APPS_SCRIPT_URL;
+  const scriptUrl = process.env.webhook;
 
   try {
     const forward = await fetch(scriptUrl, {
