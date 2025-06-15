@@ -1,8 +1,8 @@
 {
+  "version": 2,
   "routes": [
     {
-      "src": "/",
-      "methods": ["POST"],
+      "src": "/api/index",
       "dest": "api/index.js"
     }
   ]
