@@ -3,6 +3,10 @@ export default async function handler(req, res) {
     return res.status(405).send("Method Not Allowed");
   }
 
+  // ✅ Step 1: 立刻回應 LINE 200 OK，避免 timeout
+  res.status(200).send("OK");
+
+  // ✅ Step 2: 背後非同步轉送 webhook 到 Google Apps Script
   const scriptUrl = process.env.APPS_SCRIPT_URL;
 
   try {
@@ -16,10 +20,7 @@ export default async function handler(req, res) {
 
     const result = await forward.text();
     console.log("✅ Forwarded to Apps Script:", result);
-    return res.status(200).send("OK");
   } catch (err) {
     console.error("❌ Forward Failed:", err);
-    return res.status(500).send("Webhook Forward Failed");
   }
 }
-
