@@ -1,26 +1,44 @@
-export default async function handler(req, res) {
+// index.js - LINE webhook proxy server for Vercel
+
+const crypto = require("crypto");
+const fetch = require("node-fetch");
+
+module.exports = async (req, res) => {
+  // Step 1: Validate method
   if (req.method !== "POST") {
     return res.status(405).send("Method Not Allowed");
   }
 
-  // ✅ Step 1: 立刻回應 LINE 200 OK，避免 timeout
+  // Step 2: Validate LINE signature
+  const body = await getRawBody(req);
+  const signature = req.headers["x-line-signature"];
+  const secret = process.env.LINE_CHANNEL_SECRET;
+  const hash = crypto.createHmac("sha256", secret).update(body).digest("base64");
+
+  if (hash !== signature) {
+    return res.status(401).send("Unauthorized - Invalid signature");
+  }
+
+  // Step 3: Immediately respond to LINE
   res.status(200).send("OK");
 
-  // ✅ Step 2: 背後非同步轉送 webhook 到 Google Apps Script
-  const scriptUrl = process.env.webhook;
-
+  // Step 4: Forward webhook to Apps Script
   try {
-    const forward = await fetch(scriptUrl, {
+    await fetch("https://script.google.com/macros/s/AKfycbyLLrH6EuC6uNid5Ye_pNYV0JkLmwEN3voZEqyLWY5Akvlgxmw_4bX7mgw4AuocyMxS/exec", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req.body),
+      headers: { "Content-Type": "application/json" },
+      body: body
     });
-
-    const result = await forward.text();
-    console.log("✅ Forwarded to Apps Script:", result);
   } catch (err) {
-    console.error("❌ Forward Failed:", err);
+    console.error("Forwarding failed", err);
   }
+};
+
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = "";
+    req.on("data", chunk => (data += chunk));
+    req.on("end", () => resolve(data));
+    req.on("error", err => reject(err));
+  });
 }
