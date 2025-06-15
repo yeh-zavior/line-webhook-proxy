@@ -1,3 +1,8 @@
+// index.js - LINE webhook proxy server for Vercel
+
+const crypto = require("crypto");
+const fetch = require("node-fetch");
+
 module.exports = async (req, res) => {
   try {
     // Step 1: Validate method
@@ -49,3 +54,12 @@ module.exports = async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 };
+
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = "";
+    req.on("data", chunk => (data += chunk));
+    req.on("end", () => resolve(data));
+    req.on("error", err => reject(err));
+  });
+}
