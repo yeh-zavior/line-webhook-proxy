@@ -26,8 +26,10 @@ module.exports = async (req, res) => {
   try {
     await fetch("https://script.google.com/macros/s/AKfycbyLLrH6EuC6uNid5Ye_pNYV0JkLmwEN3voZEqyLWY5Akvlgxmw_4bX7mgw4AuocyMxS/exec", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: body
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `payload=${encodeURIComponent(body)}`
     });
   } catch (err) {
     console.error("Forwarding failed", err);
